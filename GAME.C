@@ -35,7 +35,22 @@ void setposi(int *xpos,int *ypos)
    int86(51,&in,&out);
 }
 
+int draw_matrix(int box_size){
+  int x_lines,y_lines,i,padding;
+  padding = 2*box_size;
+  x_lines = WIDTH/box_size -  4;
+  y_lines = HEIGHT/box_size - 4;
+  for(i = padding; i<WIDTH-padding; i+=box_size){
+    line(i, padding, i, HEIGHT-padding);
+  }
+  for(i = padding; i<HEIGHT-padding; i+=box_size){
+    line(padding, i, WIDTH-padding, i);
+  }
+  return 0;
+}
+
 int gameloop(){
+  int x,y, cl;
   do
    {
     mouseposi(&x, &y, &cl);
@@ -46,10 +61,17 @@ int gameloop(){
     setcolor((x+y)%10);
     line(x,y,x+100,y+200);
     printf("\n\tPress any key to hide the mouse");
+    if(cl == 1){
+      game_start = 1;
+      cleardevice();
+      mousehide();
+      draw_matrix(4);
+      callmouse();
+      
+    }
 
     }else{
-    gotoxy(10,9);
-    printf("You are in the fucking game! enjoy!");
+      
 
     }
    }while(!kbhit());
@@ -61,7 +83,7 @@ int gameloop(){
 int main(){
 
 	char c;
-	int a,b,gdriver = DETECT,cl, gmode,x,y;
+	int a,b,gdriver = DETECT,cl, gmode;
 	long t;
   clrscr();
 	//scanf("%c");
