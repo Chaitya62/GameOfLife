@@ -6,12 +6,13 @@
 #include<dos.h>
 #define HEIGHT 480
 #define WIDTH 640
-#define BOX_SIZE 10
+#define BOX_SIZE 20
 #define PADDING 2*BOX_SIZE
 
 union REGS in,out;
-int game_start = 0;
-short game_board[1000][1000];
+int game_start = 0, processing = 0;
+int game_board[100][100];
+int test = 0;
 
 /* MOUSE FUNCTIONS */
 
@@ -45,6 +46,7 @@ void mouseposi(int *xpos,int *ypos,int *click){
 
 
 
+
 /* DRAW AND FILL FUNCTIONS */
 
 int drawfillsquare(int x, int y, int size,int color){
@@ -65,11 +67,10 @@ int fill_box(int mousex, int mousey){
       return -1;
   }
   game_board[x][y] = !game_board[x][y];
+  gotoxy(10, 9);
+  printf("%d",&game_board[x][y] );
   mousehide();
-  //setfillstyle(SOLID_FILL, RED);
-  drawfillsquare(x+1, y+1, BOX_SIZE-2, RED);
-  //rectangle(x, y, x + BOX_SIZE, y + BOX_SIZE);
-  //floodfill(x+BOX_SIZE/2, y + BOX_SIZE/2, RED);
+  drawfillsquare(x+1, y+1, BOX_SIZE-2, (game_board[x][y]  ? RED : BLACK));
   callmouse();
   return 0;
 }
@@ -89,6 +90,30 @@ int draw_game_board(int box_size){
   return 0;
 }
 
+int draw_on_game_board(){
+  int i = 0,j = 0,x,y;
+  for(x = PADDING; x<=WIDTH-PADDING;x+=BOX_SIZE){
+
+    for(y = PADDING;y<=HEIGHT-PADDING;y+=BOX_SIZE){
+      drawfillsquare(x+1, y+1, BOX_SIZE-2,  (game_board[i][j]  ? RED : BLACK));
+      j++;
+    }
+    i++;
+  }
+  return;
+}
+
+
+/* GAME LOGIC */
+
+int produce(){
+  // NEXT MATRIX
+  game_board[test++][test] = 1;
+
+  // PUT THE ON THE BOARD
+  draw_on_game_board();
+
+}
 
 
 /*  GAME LOOP */
@@ -115,24 +140,49 @@ int gameloop(){
     }
 
     }else{
-       if(cl == 1)  fill_box(x, y);
+	 if(cl == 1 && !processing){
+		fill_box(x, y);
+		// to prevent double click
+		delay(120);
+	 }else if(cl == 2 && !processing){
+		  // start the game
+		  processing = 1;
+	 }else if(cl == 1){
+	    // pause the game
+	    processing = 0;
+	 }else if(processing){
+      mousehide();
+	    produce();
+      callmouse();
+	 }
     }
 
-    delay(60);
+    //fps
+    delay(1000/60);
    }while(!kbhit());
    return 0;
 }
 
-
+/* DEFAULTS */
+void initDefaults(){
+	int i,j;
+	for(i = 0;i<100;i++){
+		for(j = 0;j<100;j++){
+		  game_board[i][j] = 0;
+		}
+	}
+	return;
+}
 
 int main(){
 
 	char c;
 	int a,b,gdriver = DETECT,cl, gmode;
 	long t;
-  clrscr();
+	clrscr();
 	//scanf("%c");
 	printf("Press Enter to start");
+	initDefaults();
 	initgraph(&gdriver, &gmode,"C:\\TURBOC3\\BGI");
 
 	 a=100;
