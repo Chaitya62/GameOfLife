@@ -60,7 +60,7 @@ int drawfillsquare(int x, int y, int size,int color){
 	int i;
 	setcolor(color);
 	for(i = y;i<y+size;i++){
-	line(x, i, x+size, i);
+		line(x, i, x+size, i);
 	}
 	return 0;
 }
@@ -99,12 +99,12 @@ int draw_game_board(int box_size){
 int draw_on_game_board(){
 	int i = 0,j = 0,x,y;
 	for(x = PADDING; x<WIDTH-PADDING;x+=BOX_SIZE){
-	j = 0;
-	for(y = PADDING;y<HEIGHT-PADDING;y+=BOX_SIZE){
-		drawfillsquare(x+1, y+1, BOX_SIZE-2,  (game_board[i][j]  ? RED : BLACK));
-		j++;
-	}
-	i++;
+		j = 0;
+		for(y = PADDING;y<HEIGHT-PADDING;y+=BOX_SIZE){
+			drawfillsquare(x+1, y+1, BOX_SIZE-2,  (game_board[i][j]  ? RED : BLACK));
+			j++;
+		}
+		i++;
 	}
 	return;
 }
@@ -189,7 +189,7 @@ int gameloop(){
 			//cleardevice();
 			setcolor((x+y)%10);
 			line(x,y,x+100,y+200);
-			printf("\n\tPress any key to start");
+			printf("\n\tPress any key to start..");
 			if(cl == 1) {
 				game_start = 1;
 				cleardevice();
@@ -262,7 +262,6 @@ int main(){
 		while(t--);
 		exit(1);
 	}
-	//take_user_input();
 
 	getch();
 	mousehide();
