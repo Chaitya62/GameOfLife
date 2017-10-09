@@ -73,8 +73,8 @@ int fill_box(int mousex, int mousey){
 	if(x >= WIDTH-PADDING || x < PADDING || y >= HEIGHT-PADDING || y < PADDING ) {
 		return -1;
 	}
-	game_board[x][y] = !game_board[x][y];
-	
+	game_board[x][y] = (game_board[x][y] >= 1 ? 0 : 1);
+
 	mousehide();
 	drawfillsquare(x+1, y+1, BOX_SIZE-2, (game_board[x][y]  ? RED : BLACK));
 	callmouse();
@@ -101,7 +101,7 @@ int draw_on_game_board(){
 	for(x = PADDING; x<WIDTH-PADDING;x+=BOX_SIZE){
 		j = 0;
 		for(y = PADDING;y<HEIGHT-PADDING;y+=BOX_SIZE){
-			drawfillsquare(x+1, y+1, BOX_SIZE-2,  (game_board[i][j]  ? RED : BLACK));
+			drawfillsquare(x+1, y+1, BOX_SIZE-2,  (game_board[i][j] >= 1 ? (game_board[i][j] == 1 ?  RED : YELLOW) : BLACK));
 			j++;
 		}
 		i++;
@@ -114,7 +114,7 @@ int draw_on_game_board(){
 
 int get_neighbour(int x, int y) {
 	int count = 0;
-	int i,j;
+	int i,j,xi,yi;
 	int upper_x = (WIDTH - PADDING)/BOX_SIZE;
 	int lower_xy = 0;
 	int upper_y = (HEIGHT - PADDING)/ BOX_SIZE;
@@ -122,8 +122,10 @@ int get_neighbour(int x, int y) {
 	upper_y-=2;
 	for(i = -1;i<=1;i++){
 		for(j = -1;j<=1;j++){
+			xi = (x+j+upper_x)%upper_x;
+			yi = (y+i+upper_y)%upper_y;
 			if(i == 0 && j == 0) continue;
-			if(x+j <=(upper_x) && x+j >= lower_xy && y+i <= upper_y && (y+i) >= lower_xy && game_board[x+j][y+i] == 1)
+			if(x+j <=(upper_x) && x+j >= lower_xy && y+i <= upper_y && (y+i) >= lower_xy && game_board[x+j][y+i] >= 1)
 				count++;
 		}
 	}
@@ -160,13 +162,14 @@ int produce(){
 		for(y = PADDING;y<HEIGHT-PADDING;y+=BOX_SIZE){
 			int neighbour = neighbours[i][j];
 
-			if(game_board[i][j] == 1 && neighbour < 2)
+			if(game_board[i][j] >= 1 && neighbour < 2)
 			game_board[i][j] = 0;
-			else if(game_board[i][j] == 1 && neighbour > 3)
+			else if(game_board[i][j] >= 1 && neighbour > 3)
 			game_board[i][j] = 0;
 			else if(game_board[i][j] == 0 && neighbour == 3)
-			game_board[i][j] = 1;
-			
+			game_board[i][j] = 2;
+			else if(game_board[i][j] == 2) game_board[i][j] = 1;
+
 			j++;
 		}
 		i++;
